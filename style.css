@@ -1,0 +1,72 @@
+body {
+  margin: 0;
+  overflow: hidden;
+  background-color: #000; /* optional, if you want a dark background */
+  font-family: monospace;
+}
+
+/* Toolbar container */
+#toolbar-container {
+  position: fixed;
+  bottom: 12px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  pointer-events: none; /* So clicks outside toolbar pass through */
+}
+
+/* Toolbar box */
+#toolbar {
+  background-color: rgba(80, 80, 80, 0.9);
+  border: 4px solid rgb(147, 147, 147);
+  border-radius: 12px;
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  column-gap: 14px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+  pointer-events: auto; /* Still clickable */
+}
+
+/* Toolbar icons */
+.toolbar-icon {
+  width: 64px;
+  height: 64px;
+  outline: 4px solid rgb(58, 58, 58);
+  border-radius: 8px;
+  background-color: #222;
+  transition: transform 0.15s ease, outline-color 0.15s ease;
+  cursor: pointer;
+}
+
+.toolbar-icon:hover {
+  transform: scale(1.05);
+  outline-color: rgb(200, 200, 200);
+}
+
+.toolbar-icon.selected {
+  outline: 4px solid white;
+  box-shadow: 0 0 12px white;
+}
+
+/* Player info box */
+#info {
+  position: absolute;
+  right: 16px;
+  bottom: 12px;
+  font-size: 16px;
+  color: white;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 6px 10px;
+  border-radius: 6px;
+  pointer-events: none;
+  user-select: none;
+}
+
+#status {
+  position: fixed;
+  bottom: 8px;
+  left: 8px;
+  font-size: 2em;
+  color: white;
+}

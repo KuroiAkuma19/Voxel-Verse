@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <title>Voxle Verse</title>
+
+    <style>
+      /* --- 1. GAME CROSSHAIR --- */
+      #crosshair {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 20px;
+        height: 20px;
+        transform: translate(-50%, -50%);
+        pointer-events: none; /* Let clicks pass through to the game */
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        color: rgba(255, 255, 255, 0.8);
+        text-shadow: 1px 1px 2px black;
+        font-family: monospace;
+      }
+
+      /* --- 2. CENTERED PAUSE MENU STYLING --- */
+      /* This targets the UI created in ui.js */
+      .lil-gui.root {
+        position: absolute !important;
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        z-index: 2000 !important;
+        /* Visual Polish */
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+        border: 2px solid #666;
+        border-radius: 4px;
+      }
+
+      /* Darker, game-like theme for the menu */
+      .lil-gui {
+        --background-color: #1a1a1a;
+        --text-color: #ffffff;
+        --title-background-color: #2a2a2a;
+        --widget-color: #444;
+        --hover-color: #555;
+        --focus-color: #666;
+        --number-color: #4facfe;
+        --string-color: #00f260;
+      }
+
+      /* --- 3. HELPER TEXT --- */
+      #controls-hint {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        color: white;
+        font-family: monospace;
+        font-size: 14px;
+        background: rgba(0, 0, 0, 0.5);
+        padding: 5px 10px;
+        border-radius: 4px;
+        pointer-events: none;
+        user-select: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+
+    <div id="crosshair">+</div>
+
+    <div id="controls-hint">Press <b>P</b> for Menu / ESC to Mouse</div>
+
+    <div id="toolbar-container">
+      <div id="toolbar">
+        <img
+          class="toolbar-icon selected"
+          id="toolbar-0"
+          src="/textures/pickaxe.png"
+        />
+        <img class="toolbar-icon" id="toolbar-1" src="/textures/grass.png" />
+        <img class="toolbar-icon" id="toolbar-2" src="/textures/dirt.png" />
+        <img class="toolbar-icon" id="toolbar-3" src="/textures/stone.png" />
+        <img class="toolbar-icon" id="toolbar-4" src="/textures/coal_ore.png" />
+        <img class="toolbar-icon" id="toolbar-5" src="/textures/iron_ore.png" />
+        <img class="toolbar-icon" id="toolbar-6" src="/textures/tree_top.png" />
+        <img
+          class="toolbar-icon"
+          id="toolbar-7"
+          src="/textures/cherry_leaves.png"
+        />
+        <img class="toolbar-icon" id="toolbar-8" src="/textures/sand.png" />
+      </div>
+    </div>
+
+    <div id="info">
+      <div id="player-position"></div>
+    </div>
+
+    <div id="status"></div>
+    <script type="module" src="/scripts/main.js"></script>
+  </body>
+</html>
