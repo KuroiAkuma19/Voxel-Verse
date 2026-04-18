@@ -10,6 +10,9 @@ import { World } from "./world.js";
 import { blocks } from "./blocks.js";
 import { ModelLoader } from "./modelLoader.js";
 
+
+const baseUrl = import.meta.env.BASE_URL;
+
 const stats = new Stats();
 document.body.append(stats.dom);
 
@@ -39,10 +42,12 @@ const world = new World();
 world.createWorld();
 scene.add(world);
 
-const player = new Player(scene);
+
+export const player = new Player(scene);
 const physics = new Physics(scene);
 
 const modelLoader = new ModelLoader();
+
 modelLoader.loadModels((models) => {
   player.tool.setMesh(models.pickaxe);
 });
@@ -106,22 +111,17 @@ scene.add(fillLight);
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
 scene.add(ambientLight);
 
-// ===================================
-// ===== INTERACTION HANDLER =========
-// ===================================
+
 
 function onMouseDown(event) {
   if (!player.controls.isLocked) return;
 
-  // --- RIGHT CLICK (Launch or Place) ---
   if (event.button === 2) {
-    // 1. LAUNCH LOGIC (If in Hover Mode)
     if (player.isFlying) {
       player.launch();
-      return; // Don't place blocks if launching
+      return;
     }
 
-    // 2. INTERACTION LOGIC (Crafting)
     if (player.selectedCoords) {
       const targetBlock = world.getBlock(
         player.selectedCoords.x,
@@ -136,7 +136,6 @@ function onMouseDown(event) {
       }
     }
 
-    // 3. PLACE LOGIC
     if (player.selectedCoords && player.activeBlockId !== blocks.empty.id) {
       if (player.hasItem(player.activeBlockId, 1)) {
         player.removeInventoryItem(player.activeBlockId, 1);
@@ -153,7 +152,6 @@ function onMouseDown(event) {
     }
   }
 
-  // --- LEFT CLICK (Break / Collect) ---
   else if (event.button === 0) {
     if (!player.selectedCoords) return;
 
@@ -165,7 +163,6 @@ function onMouseDown(event) {
     );
 
     if (blockToBreak && blockToBreak.id !== blocks.empty.id) {
-      // Drop Logic (Grass -> Dirt)
       let dropId = blockToBreak.id;
       if (dropId === blocks.grass.id) dropId = blocks.dirt.id;
       if (dropId === blocks.stone.id) dropId = blocks.cobblestone.id;
@@ -186,7 +183,9 @@ const listener = new THREE.AudioListener();
 player.camera.add(listener);
 const ambientSound = new THREE.Audio(listener);
 const audioLoader = new THREE.AudioLoader();
-audioLoader.load("ambient.mp3", (buffer) => {
+
+// FIXED: Added baseUrl to the audio path
+audioLoader.load(`${baseUrl}ambient.mp3`, (buffer) => {
   ambientSound.setBuffer(buffer);
   ambientSound.setLoop(true);
   ambientSound.setVolume(0.4);

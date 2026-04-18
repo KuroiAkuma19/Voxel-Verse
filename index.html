@@ -252,15 +252,16 @@
 
     <div id="status"></div>
 
-    <script type="module" src="/scripts/main.js"></script>
+    <script type="module" src="./scripts/main.js"></script>
 
     <script type="module">
-      import { player } from "/scripts/main.js";
+      import { player } from "./scripts/main.js";
 
       const titleScreen = document.getElementById("title-screen");
       const gameUI = document.getElementById("game-ui");
       const btnPlay = document.getElementById("btn-play");
       const btnQuit = document.getElementById("btn-quit");
+      import { player } from "./scripts/main.js";
 
       btnPlay.addEventListener("click", () => {
         titleScreen.style.display = "none";
