@@ -19,6 +19,8 @@
         margin: 0;
         overflow: hidden;
         font-family: "Minecraft", "Courier New", monospace;
+        /* SAFARI FIX: Added -webkit prefix */
+        -webkit-user-select: none;
         user-select: none;
       }
 
@@ -70,6 +72,8 @@
           rgba(0, 0, 0, 0.2) 0%,
           rgba(0, 0, 0, 0.6) 100%
         );
+        /* SAFARI FIX: Added -webkit-backdrop-filter */
+        -webkit-backdrop-filter: blur(4px);
         backdrop-filter: blur(4px);
       }
 
@@ -142,14 +146,13 @@
         bottom: 10px;
         left: 50%;
         transform: translateX(-50%);
-        /* FIX: Made transparent to remove the dark strip */
         background-color: transparent;
         padding: 5px;
       }
 
       #toolbar {
         display: flex;
-        gap: 0px; /* Seamless blocks */
+        gap: 0px; 
       }
 
       .toolbar-icon {
@@ -178,7 +181,6 @@
         text-shadow: 1px 1px 0 #000;
       }
 
-      /* --- 5. OVERRIDES --- */
       .lil-gui.root {
         z-index: 2000 !important;
       }
@@ -209,35 +211,15 @@
 
       <div id="toolbar-container">
         <div id="toolbar">
-          <img
-            class="toolbar-icon selected"
-            id="toolbar-0"
-            src="/textures/pickaxe.png"
-          />
-          <img class="toolbar-icon" id="toolbar-1" src="/textures/grass.png" />
-          <img class="toolbar-icon" id="toolbar-2" src="/textures/dirt.png" />
-          <img class="toolbar-icon" id="toolbar-3" src="/textures/stone.png" />
-          <img
-            class="toolbar-icon"
-            id="toolbar-4"
-            src="/textures/coal_ore.png"
-          />
-          <img
-            class="toolbar-icon"
-            id="toolbar-5"
-            src="/textures/iron_ore.png"
-          />
-          <img
-            class="toolbar-icon"
-            id="toolbar-6"
-            src="/textures/tree_top.png"
-          />
-          <img
-            class="toolbar-icon"
-            id="toolbar-7"
-            src="/textures/cherry_leaves.png"
-          />
-          <img class="toolbar-icon" id="toolbar-8" src="/textures/sand.png" />
+          <img class="toolbar-icon selected" id="toolbar-0" src="./textures/pickaxe.png" />
+          <img class="toolbar-icon" id="toolbar-1" src="./textures/grass.png" />
+          <img class="toolbar-icon" id="toolbar-2" src="./textures/dirt.png" />
+          <img class="toolbar-icon" id="toolbar-3" src="./textures/stone.png" />
+          <img class="toolbar-icon" id="toolbar-4" src="./textures/coal_ore.png" />
+          <img class="toolbar-icon" id="toolbar-5" src="./textures/iron_ore.png" />
+          <img class="toolbar-icon" id="toolbar-6" src="./textures/tree_top.png" />
+          <img class="toolbar-icon" id="toolbar-7" src="./textures/cherry_leaves.png" />
+          <img class="toolbar-icon" id="toolbar-8" src="./textures/sand.png" />
         </div>
       </div>
 
@@ -261,20 +243,29 @@
       const gameUI = document.getElementById("game-ui");
       const btnPlay = document.getElementById("btn-play");
       const btnQuit = document.getElementById("btn-quit");
-      import { player } from "./scripts/main.js";
 
-      btnPlay.addEventListener("click", () => {
-        titleScreen.style.display = "none";
-        gameUI.style.display = "block";
-        setTimeout(() => {
-          if (player && player.controls) player.controls.lock();
-        }, 100);
-      });
+      // FIXED: Removed duplicate 'import { player }' from here
 
-      btnQuit.addEventListener("click", () => {
-        window.close();
-        window.location.href = "about:blank";
-      });
+      if (btnPlay) {
+        btnPlay.addEventListener("click", () => {
+          titleScreen.style.display = "none";
+          gameUI.style.display = "block";
+          setTimeout(() => {
+            // Check if player and controls are initialized
+            if (player && player.controls) {
+                player.controls.lock();
+            }
+          }, 100);
+        });
+      }
+
+      if (btnQuit) {
+        btnQuit.addEventListener("click", () => {
+          if (confirm("Quit VoxelVerse?")) {
+              window.location.reload();
+          }
+        });
+      }
     </script>
   </body>
 </html>
