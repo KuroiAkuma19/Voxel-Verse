@@ -117,6 +117,32 @@ const textures = {
   stone: loadTexture("/textures/stone.png", "noise", "#909090", "#707070"),
   coalOre: loadTexture("/textures/coal_ore.png", "noise", "#909090", "#000000"),
   ironOre: loadTexture("/textures/iron_ore.png", "noise", "#909090", "#d6a874"),
+
+  // CRAFTING TABLE
+  crafting_table_side: loadTexture(
+    "/textures/crafting_table_side.png",
+    "pillar",
+    "#3b291d",
+    "#261911"
+  ),
+  crafting_table_top: loadTexture(
+    "/textures/crafting_table_top.png",
+    "rings",
+    "#5e4835",
+    "#3b291d"
+  ),
+  crafting_table_front: loadTexture(
+    "/textures/crafting_table_front.png",
+    "pillar",
+    "#3b291d",
+    "#261911"
+  ),
+
+  // NEW BUILDING TEXTURES (Procedural fallbacks)
+  door_top: createProceduralTexture("pillar", "#5e4835", "#3b291d"),
+  door_bottom: createProceduralTexture("pillar", "#5e4835", "#3b291d"),
+  stone_bricks: createProceduralTexture("bricks", "#757575", "#505050"),
+
   grass_side_snowed: loadTexture(
     "/textures/grass_side_snowed.png",
     "layers",
@@ -193,8 +219,6 @@ const textures = {
   plank: createProceduralTexture("bricks", "#a07449", "#805836"),
   cobblestone: createProceduralTexture("noise", "#606060", "#404040"),
   glass: createProceduralTexture("noise", "#e0f0ff", "#ffffff"),
-
-  // --- NEW ADDED TEXTURES ---
   gravel: loadTexture("/textures/gravel.png", "noise", "#7f7f7f", "#5e5e5e"),
   coarse_dirt: loadTexture(
     "/textures/coarse_dirt.png",
@@ -244,10 +268,13 @@ const textures = {
     "#3b291d",
     "#261911"
   ),
+
+  moss: createProceduralTexture("noise", "#647D33", "#455E24"),
+  glowstone: createProceduralTexture("noise", "#ffcc66", "#eebb00"),
 };
 
 export const blocks = {
-  // --- EXISTING BLOCKS (0 - 26) ---
+  // 0 - 26 (Originals)
   empty: { id: 0, name: "Empty" },
   grass: {
     id: 1,
@@ -502,7 +529,7 @@ export const blocks = {
     }),
   },
 
-  // --- NEW BLOCKS FROM UPLOADED TEXTURES ---
+  // --- NEW BLOCKS ---
   gravel: {
     id: 27,
     name: "Gravel",
@@ -529,7 +556,6 @@ export const blocks = {
     id: 31,
     name: "Podzol",
     material: [
-      // Right, Left, Top, Bottom, Front, Back
       new THREE.MeshLambertMaterial({ map: textures.podzol_side }),
       new THREE.MeshLambertMaterial({ map: textures.podzol_side }),
       new THREE.MeshLambertMaterial({ map: textures.podzol_top }),
@@ -541,15 +567,61 @@ export const blocks = {
   packedIce: {
     id: 32,
     name: "Packed Ice",
-    material: new THREE.MeshLambertMaterial({
-      map: textures.packed_ice,
-    }),
+    material: new THREE.MeshLambertMaterial({ map: textures.packed_ice }),
   },
   blueIce: {
     id: 33,
     name: "Blue Ice",
-    material: new THREE.MeshLambertMaterial({
-      map: textures.blue_ice,
+    material: new THREE.MeshLambertMaterial({ map: textures.blue_ice }),
+  },
+
+  // 40: Crafting Table
+  craftingTable: {
+    id: 40,
+    name: "Crafting Table",
+    material: [
+      new THREE.MeshLambertMaterial({ map: textures.crafting_table_side }),
+      new THREE.MeshLambertMaterial({ map: textures.crafting_table_side }),
+      new THREE.MeshLambertMaterial({ map: textures.crafting_table_top }),
+      new THREE.MeshLambertMaterial({ map: textures.plank }),
+      new THREE.MeshLambertMaterial({ map: textures.crafting_table_front }),
+      new THREE.MeshLambertMaterial({ map: textures.crafting_table_side }),
+    ],
+  },
+
+  // --- BUILDINGS (Added) ---
+  door: {
+    id: 41,
+    name: "Door",
+    material: new THREE.MeshLambertMaterial({ map: textures.door_top }),
+  }, // Placeholder 1x1 block
+  stoneBricks: {
+    id: 42,
+    name: "Stone Bricks",
+    material: new THREE.MeshLambertMaterial({ map: textures.stone_bricks }),
+  },
+  oakStairs: {
+    id: 43,
+    name: "Oak Stairs",
+    material: new THREE.MeshLambertMaterial({ map: textures.plank }),
+  }, // Block placeholder
+  oakSlab: {
+    id: 44,
+    name: "Oak Slab",
+    material: new THREE.MeshLambertMaterial({ map: textures.plank }),
+  }, // Block placeholder
+
+  moss: {
+    id: 50,
+    name: "Moss Block",
+    material: new THREE.MeshLambertMaterial({ map: textures.moss }),
+  },
+  glowstone: {
+    id: 51,
+    name: "Glowstone",
+    material: new THREE.MeshBasicMaterial({
+      map: textures.glowstone,
+      color: 0xffddaa,
     }),
   },
 };

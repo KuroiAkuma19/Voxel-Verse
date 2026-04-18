@@ -11,10 +11,12 @@ export class Player {
   jumpSpeed = 10;
   onGround = false;
 
-  // Feature: Reduced speeds and Run support
-  maxSpeed = 20; // Kept for compatibility, but overridden by walk/run below
-  walkSpeed = 6;
-  runSpeed = 10;
+  maxSpeed = 10;
+  walkSpeed = 4;
+  runSpeed = 7;
+  flySpeed = 15;
+
+  isFlying = false;
 
   input = new THREE.Vector3();
   velocity = new THREE.Vector3();
@@ -34,8 +36,11 @@ export class Player {
     5
   );
   selectedCoords = null;
-  activeBlockId = blocks.grass.id;
+  activeBlockId = blocks.craftingTable.id;
   tool = new Tool();
+
+  inventory = {};
+  onInventoryChange = null;
 
   _worldVelocity = new THREE.Vector3();
   _euler = new THREE.Euler(0, 0, 0, "YXZ");
@@ -44,7 +49,6 @@ export class Player {
   _viewDir = new THREE.Vector3();
   _lastPositionText = "";
 
-  // Input State Tracking
   keyStates = {};
 
   constructor(scene) {
@@ -77,6 +81,42 @@ export class Player {
     scene.add(this.selectionHelper);
 
     this.raycaster.layers.set(0);
+
+    const startingItems = [
+      blocks.grass.id,
+      blocks.dirt.id,
+      blocks.stone.id,
+      blocks.coalOre.id,
+      blocks.ironOre.id,
+      blocks.tree.id,
+      blocks.leaves.id,
+      blocks.sand.id,
+      blocks.snow.id,
+      blocks.jungleTree.id,
+      blocks.spruceLog.id,
+      blocks.cobblestone.id,
+      blocks.gravel.id,
+      blocks.craftingTable.id,
+    ];
+    startingItems.forEach((id) => (this.inventory[id] = 64));
+  }
+
+  addInventoryItem(id, count) {
+    if (!this.inventory[id]) this.inventory[id] = 0;
+    this.inventory[id] += count;
+    if (this.onInventoryChange) this.onInventoryChange();
+  }
+
+  removeInventoryItem(id, count) {
+    if (this.inventory[id]) {
+      this.inventory[id] -= count;
+      if (this.inventory[id] <= 0) delete this.inventory[id];
+    }
+    if (this.onInventoryChange) this.onInventoryChange();
+  }
+
+  hasItem(id, count = 1) {
+    return this.inventory[id] && this.inventory[id] >= count;
   }
 
   get worldVelocity() {
@@ -90,6 +130,7 @@ export class Player {
     this.updateRaycaster(world);
     this.updateVisibleChunks(world);
     this.updateBoundsHelper();
+    this.tool.update();
   }
 
   updateRaycaster(world) {
@@ -151,23 +192,41 @@ export class Player {
     this.velocity.add(dv);
   }
 
-  // Feature: Updated to handle Run/Walk logic
   applyInputs(dt) {
     if (this.controls.isLocked) {
-      // Check Shift key for speed
-      const speed = this.keyStates["ShiftLeft"]
-        ? this.runSpeed
-        : this.walkSpeed;
-
-      // Reset horizontal velocity to re-calculate from keys
       this.velocity.x = 0;
       this.velocity.z = 0;
 
-      // Continuous key checking
-      if (this.keyStates["KeyW"]) this.velocity.z += speed;
-      if (this.keyStates["KeyS"]) this.velocity.z -= speed;
-      if (this.keyStates["KeyA"]) this.velocity.x -= speed;
-      if (this.keyStates["KeyD"]) this.velocity.x += speed;
+      // --- FLYING MOVEMENT ---
+      if (this.isFlying) {
+        // Reset vertical velocity
+        this.velocity.y = 0;
+
+        // UPDATED: Shift = Up, Space = Down
+        if (this.keyStates["ShiftLeft"]) {
+          this.velocity.y = this.flySpeed;
+        }
+        if (this.keyStates["Space"]) {
+          this.velocity.y = -this.flySpeed;
+        }
+
+        // Horizontal Flying
+        if (this.keyStates["KeyW"]) this.velocity.z += this.flySpeed;
+        if (this.keyStates["KeyS"]) this.velocity.z -= this.flySpeed;
+        if (this.keyStates["KeyA"]) this.velocity.x -= this.flySpeed;
+        if (this.keyStates["KeyD"]) this.velocity.x += this.flySpeed;
+      }
+      // --- WALKING MOVEMENT ---
+      else {
+        const speed = this.keyStates["ShiftLeft"]
+          ? this.runSpeed
+          : this.walkSpeed;
+
+        if (this.keyStates["KeyW"]) this.velocity.z += speed;
+        if (this.keyStates["KeyS"]) this.velocity.z -= speed;
+        if (this.keyStates["KeyA"]) this.velocity.x -= speed;
+        if (this.keyStates["KeyD"]) this.velocity.x += speed;
+      }
 
       this.controls.moveRight(this.velocity.x * dt);
       this.controls.moveForward(this.velocity.z * dt);
@@ -203,6 +262,12 @@ export class Player {
     }
 
     switch (event.code) {
+      case "KeyF":
+        this.isFlying = !this.isFlying;
+        console.log(`Fly Mode: ${this.isFlying ? "ON" : "OFF"}`);
+        this.velocity.y = 0;
+        break;
+
       case "Digit0":
       case "Digit1":
       case "Digit2":
@@ -227,7 +292,7 @@ export class Player {
         this.velocity.set(0, 0, 0);
         break;
       case "Space":
-        if (this.onGround) {
+        if (this.onGround && !this.isFlying) {
           this.velocity.y = this.jumpSpeed;
         }
         break;
@@ -237,6 +302,6 @@ export class Player {
   toString() {
     return `X: ${this.position.x.toFixed(1)} Y: ${this.position.y.toFixed(
       1
-    )} Z: ${this.position.z.toFixed(1)}`;
+    )} Z: ${this.position.z.toFixed(1)} | Fly: ${this.isFlying ? "ON" : "OFF"}`;
   }
 }

@@ -11,13 +11,11 @@
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist"
   },
-"devDependencies": {
+  "devDependencies": {
     "@types/three": "^0.178.1",
-    "@vitejs/plugin-react": "^4.3.4",
-    "vite": "^5.4.11"
+    "vite": "^7.0.4"
   },
   "dependencies": {
-    "gh-pages": "^6.3.0",
     "three": "^0.178.0"
   }
 }

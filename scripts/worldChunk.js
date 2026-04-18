@@ -50,11 +50,11 @@ export class WorldChunk extends THREE.Group {
       this.loaded = true;
     } catch (e) {
       console.error("Chunk generation error:", e);
-      this.loaded = true; // Ensures world doesn't stall
+      this.loaded = true; // Ensure world doesn't stall
     }
   }
 
-  //  HELPER: TIME SLICING 
+  // --- HELPER: TIME SLICING ---
   // Checks if we've blocked the thread for too long.
   // If > 8ms passed since last check, pause execution.
   async yieldControl(startTime) {
@@ -139,7 +139,7 @@ export class WorldChunk extends THREE.Group {
     // Iterate Resources
     for (const resource of resources) {
       for (let x = 0; x < this.size.width; x++) {
-        t = await this.yieldControl(t); 
+        t = await this.yieldControl(t); // Yield
         for (let y = 0; y < this.size.height; y++) {
           for (let z = 0; z < this.size.width; z++) {
             const value = simplex.noise3d(
@@ -377,6 +377,7 @@ export class WorldChunk extends THREE.Group {
     const desiredCount = 15;
     let placedCount = 0;
 
+    // Structures loop can be heavy, yield here
     let t = performance.now();
 
     for (let i = 0; i < attempts; i++) {
@@ -415,7 +416,7 @@ export class WorldChunk extends THREE.Group {
     }
   }
 
-
+  // ... (Building Helper functions: buildHouse, buildCottage, etc. remain unchanged) ...
   buildHouse(x, y, z, rng) {
     const type = Math.floor(rng.random() * 4);
     switch (type) {

@@ -7,14 +7,13 @@ export class Physics {
   timestep = 1 / this.simulationRate;
   accumulator = 0;
 
-  // Reusable temporaries to avoid Garbage Collection
   _tempVector = new THREE.Vector3();
   _tempNormal = new THREE.Vector3();
   _closestPoint = new THREE.Vector3();
 
   constructor(scene) {
     this.helpers = new THREE.Group();
-    this.helpers.visible = false; // Hide debug helpers by default
+    this.helpers.visible = false;
     scene.add(this.helpers);
 
     const cylGeo = new THREE.CylinderGeometry(1, 1, 1, 16, 1, true);
@@ -28,64 +27,57 @@ export class Physics {
 
   update(dt, player, world) {
     this.accumulator += dt;
-    // Cap accumulator to prevent "Spiral of Death" on lag spikes (max 5 frames)
     if (this.accumulator > 0.1) this.accumulator = 0.1;
 
-    // Get the water level from world params (add 0.4 because the visual mesh is offset)
     const waterLevel = world.params.terrain.waterOffset + 0.4;
 
     while (this.accumulator >= this.timestep) {
-      // 1. Check if Player is in Water
-      // player.position is at eye level. Feet are at (y - height).
-      // We check if the body (chest level) is submerged.
-      const chestLevel = player.position.y - player.height * 0.7;
-      const isInWater = chestLevel < waterLevel;
-
-      if (isInWater) {
-        // --- WATER PHYSICS ---
-
-        // A. Sinking Logic (Low Gravity)
-        // Instead of 32, we use a much lower gravity to simulate buoyancy
-        player.velocity.y -= 3.0 * this.timestep;
-
-        // Terminal Velocity (Don't sink too fast)
-        if (player.velocity.y < -2) {
-          player.velocity.y = -2;
-        }
-
-        // B. Swimming Logic (W,A,S,D + Shift)
-        const isMoving =
-          player.keyStates["KeyW"] ||
-          player.keyStates["KeyS"] ||
-          player.keyStates["KeyA"] ||
-          player.keyStates["KeyD"];
-        const isSprinting = player.keyStates["ShiftLeft"];
-
-        if (isMoving && isSprinting) {
-          // Apply upward force to swim to surface
-          player.velocity.y = 3.0;
-
-          // Prevent launching out of water like a rocket
-          // If we breach the surface, dampen the upward speed
-          if (player.position.y >= waterLevel) {
-            player.velocity.y = Math.min(player.velocity.y, 0.5);
-          }
-        }
-
-        // C. Apply Inputs (Horizontal Movement)
+      // --- FLYING LOGIC (Skip Physics) ---
+      if (player.isFlying) {
+        // Just apply the movement inputs from Player.js directly
         player.applyInputs(this.timestep);
-
-        // D. Water Resistance (Slow down movement)
-        player.velocity.x *= 0.6; // 60% of normal speed
-        player.velocity.z *= 0.6;
+        // (Optional) We still run collision detection below if you want
+        // to stop player from flying through walls.
+        // If you want "NoClip" (ghost mode), comment out detectCollisions below.
       } else {
-        // --- NORMAL AIR PHYSICS ---
-        player.velocity.y -= this.gravity * this.timestep;
-        player.applyInputs(this.timestep);
+        // --- NORMAL PHYSICS (Gravity / Water) ---
+        const chestLevel = player.position.y - player.height * 0.7;
+        const isInWater = chestLevel < waterLevel;
+
+        if (isInWater) {
+          // Water Physics
+          player.velocity.y -= 3.0 * this.timestep;
+          if (player.velocity.y < -2) player.velocity.y = -2;
+
+          const isMoving =
+            player.keyStates["KeyW"] ||
+            player.keyStates["KeyS"] ||
+            player.keyStates["KeyA"] ||
+            player.keyStates["KeyD"];
+          const isSprinting = player.keyStates["ShiftLeft"];
+
+          if (isMoving && isSprinting) {
+            player.velocity.y = 3.0;
+            if (player.position.y >= waterLevel) {
+              player.velocity.y = Math.min(player.velocity.y, 0.5);
+            }
+          }
+
+          player.applyInputs(this.timestep);
+          player.velocity.x *= 0.6;
+          player.velocity.z *= 0.6;
+        } else {
+          // Air Physics
+          player.velocity.y -= this.gravity * this.timestep;
+          player.applyInputs(this.timestep);
+        }
       }
 
       // 2. Collision Detection
+      // We keep this running even when flying so you don't accidentally fly into the void or get stuck in a wall.
+      // To enable "Ghost Mode", wrap this in if (!player.isFlying)
       this.detectCollisions(player, world);
+
       this.accumulator -= this.timestep;
     }
 
@@ -159,8 +151,6 @@ export class Physics {
         const overlapY = player.height / 2 - Math.abs(dy);
         const overlapXZ = player.radius - Math.sqrt(dx * dx + dz * dz);
 
-        // If falling, we prefer to resolve vertically unless we are very deep inside the block.
-        // This prevents the "sideways ejection" glitch that puts you inside walls.
         const verticalThreshold = player.velocity.y < 0 ? 0.2 : 0;
 
         let normal, overlap;

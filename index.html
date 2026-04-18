@@ -5,104 +5,275 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="style.css" />
-    <title>Voxle Verse</title>
+    <title>VoxelVerse</title>
 
     <style>
-      /* --- 1. GAME CROSSHAIR --- */
+      /* --- 1. FONTS & RESET --- */
+      @font-face {
+        font-family: "Minecraft";
+        src: url("https://fonts.cdnfonts.com/s/18345/MinecraftRegular-Bmg3.woff")
+          format("woff");
+      }
+
+      body {
+        margin: 0;
+        overflow: hidden;
+        font-family: "Minecraft", "Courier New", monospace;
+        user-select: none;
+      }
+
+      /* --- 2. MINECRAFT BUTTON STYLES --- */
+      .mc-button {
+        position: relative;
+        width: 400px;
+        padding: 15px 0;
+        margin-bottom: 10px;
+        font-family: "Minecraft", monospace;
+        font-size: 20px;
+        color: #ddd;
+        text-shadow: 2px 2px 0px #000;
+        cursor: pointer;
+        background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAIklEQVQIW2NkQAKrVq36zwjjgzjwqJAQGwQBJgQWQAAjgwEA628QA02a6g8AAAAASUVORK5CYII=")
+          repeat;
+        background-color: #666;
+        image-rendering: pixelated;
+        border: 2px solid #000;
+        box-shadow: inset 2px 2px 0px #aaa, inset -2px -2px 0px #222;
+      }
+
+      .mc-button:hover {
+        background-color: #777;
+        color: #ffffa0;
+        box-shadow: inset 2px 2px 0px #ccc, inset -2px -2px 0px #333;
+      }
+
+      .mc-button:active {
+        background-color: #444;
+        box-shadow: inset 2px 2px 0px #222, inset -2px -2px 0px #888;
+        transform: translateY(2px);
+      }
+
+      /* --- 3. TITLE SCREEN --- */
+      #title-screen {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 5000;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: radial-gradient(
+          circle,
+          rgba(0, 0, 0, 0.2) 0%,
+          rgba(0, 0, 0, 0.6) 100%
+        );
+        backdrop-filter: blur(4px);
+      }
+
+      .logo-container {
+        margin-bottom: 50px;
+        position: relative;
+      }
+
+      .game-title {
+        font-size: 72px;
+        color: #c6c6c6;
+        margin: 0;
+        letter-spacing: 2px;
+        text-shadow: 0px 4px #6f6f6f, 0px 6px #3f3f3f, 0px 8px #202020,
+          4px 8px 10px rgba(0, 0, 0, 0.5);
+      }
+
+      .splash-text {
+        position: absolute;
+        bottom: -15px;
+        right: -50px;
+        font-size: 20px;
+        color: #ffff55;
+        transform: rotate(-20deg);
+        text-shadow: 2px 2px 0px #3f3f00;
+        animation: pulse 0.4s infinite alternate ease-in-out;
+      }
+
+      @keyframes pulse {
+        from {
+          transform: rotate(-20deg) scale(1);
+        }
+        to {
+          transform: rotate(-20deg) scale(1.1);
+        }
+      }
+
+      .footer-text {
+        position: absolute;
+        bottom: 5px;
+        left: 5px;
+        color: #fff;
+        font-size: 14px;
+        text-shadow: 1px 1px 0 #000;
+      }
+
+      /* --- 4. GAME HUD --- */
+      #game-ui {
+        display: none;
+      }
+
       #crosshair {
         position: absolute;
         top: 50%;
         left: 50%;
-        width: 20px;
-        height: 20px;
+        width: 16px;
+        height: 16px;
         transform: translate(-50%, -50%);
-        pointer-events: none; /* Let clicks pass through to the game */
+        pointer-events: none;
+        background: linear-gradient(#fff, #fff), linear-gradient(#fff, #fff);
+        background-position: center;
+        background-size: 16px 2px, 2px 16px;
+        background-repeat: no-repeat;
+        mix-blend-mode: difference;
         z-index: 100;
+      }
+
+      #toolbar-container {
+        position: absolute;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        /* FIX: Made transparent to remove the dark strip */
+        background-color: transparent;
+        padding: 5px;
+      }
+
+      #toolbar {
         display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 24px;
-        color: rgba(255, 255, 255, 0.8);
-        text-shadow: 1px 1px 2px black;
-        font-family: monospace;
+        gap: 0px; /* Seamless blocks */
       }
 
-      /* --- 2. CENTERED PAUSE MENU STYLING --- */
-      /* This targets the UI created in ui.js */
-      .lil-gui.root {
-        position: absolute !important;
-        top: 50% !important;
-        left: 50% !important;
-        transform: translate(-50%, -50%) !important;
-        z-index: 2000 !important;
-        /* Visual Polish */
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
-        border: 2px solid #666;
-        border-radius: 4px;
+      .toolbar-icon {
+        width: 40px;
+        height: 40px;
+        border: 2px solid #555;
+        background: rgba(0, 0, 0, 0.3);
+        image-rendering: pixelated;
+        box-sizing: border-box;
       }
 
-      /* Darker, game-like theme for the menu */
-      .lil-gui {
-        --background-color: #1a1a1a;
-        --text-color: #ffffff;
-        --title-background-color: #2a2a2a;
-        --widget-color: #444;
-        --hover-color: #555;
-        --focus-color: #666;
-        --number-color: #4facfe;
-        --string-color: #00f260;
+      .toolbar-icon.selected {
+        border: 3px solid #fff;
+        background: rgba(255, 255, 255, 0.2);
+        transform: scale(1.1);
+        z-index: 10;
+        position: relative;
       }
 
-      /* --- 3. HELPER TEXT --- */
       #controls-hint {
         position: absolute;
-        top: 10px;
-        left: 10px;
-        color: white;
-        font-family: monospace;
-        font-size: 14px;
-        background: rgba(0, 0, 0, 0.5);
-        padding: 5px 10px;
-        border-radius: 4px;
-        pointer-events: none;
-        user-select: none;
+        top: 5px;
+        right: 5px;
+        color: #ddd;
+        font-size: 12px;
+        text-shadow: 1px 1px 0 #000;
+      }
+
+      /* --- 5. OVERRIDES --- */
+      .lil-gui.root {
+        z-index: 2000 !important;
+      }
+
+      #inventory-screen {
+        display: none;
       }
     </style>
   </head>
   <body>
     <div id="app"></div>
 
-    <div id="crosshair">+</div>
+    <div id="title-screen">
+      <div class="logo-container">
+        <h1 class="game-title">VOXELVERSE</h1>
+        <div class="splash-text">Creative Update!</div>
+      </div>
+      <button class="mc-button" id="btn-play">Singleplayer</button>
+      <button class="mc-button" id="btn-quit">Quit Game</button>
+      <div class="footer-text">VoxelVerse Client v1.3</div>
+    </div>
 
-    <div id="controls-hint">Press <b>P</b> for Menu / ESC to Mouse</div>
+    <div id="game-ui">
+      <div id="crosshair"></div>
+      <div id="controls-hint">
+        Press <b>P</b> for Menu | <b>E</b> for Inventory
+      </div>
 
-    <div id="toolbar-container">
-      <div id="toolbar">
-        <img
-          class="toolbar-icon selected"
-          id="toolbar-0"
-          src="/textures/pickaxe.png"
-        />
-        <img class="toolbar-icon" id="toolbar-1" src="/textures/grass.png" />
-        <img class="toolbar-icon" id="toolbar-2" src="/textures/dirt.png" />
-        <img class="toolbar-icon" id="toolbar-3" src="/textures/stone.png" />
-        <img class="toolbar-icon" id="toolbar-4" src="/textures/coal_ore.png" />
-        <img class="toolbar-icon" id="toolbar-5" src="/textures/iron_ore.png" />
-        <img class="toolbar-icon" id="toolbar-6" src="/textures/tree_top.png" />
-        <img
-          class="toolbar-icon"
-          id="toolbar-7"
-          src="/textures/cherry_leaves.png"
-        />
-        <img class="toolbar-icon" id="toolbar-8" src="/textures/sand.png" />
+      <div id="toolbar-container">
+        <div id="toolbar">
+          <img
+            class="toolbar-icon selected"
+            id="toolbar-0"
+            src="/textures/pickaxe.png"
+          />
+          <img class="toolbar-icon" id="toolbar-1" src="/textures/grass.png" />
+          <img class="toolbar-icon" id="toolbar-2" src="/textures/dirt.png" />
+          <img class="toolbar-icon" id="toolbar-3" src="/textures/stone.png" />
+          <img
+            class="toolbar-icon"
+            id="toolbar-4"
+            src="/textures/coal_ore.png"
+          />
+          <img
+            class="toolbar-icon"
+            id="toolbar-5"
+            src="/textures/iron_ore.png"
+          />
+          <img
+            class="toolbar-icon"
+            id="toolbar-6"
+            src="/textures/tree_top.png"
+          />
+          <img
+            class="toolbar-icon"
+            id="toolbar-7"
+            src="/textures/cherry_leaves.png"
+          />
+          <img class="toolbar-icon" id="toolbar-8" src="/textures/sand.png" />
+        </div>
+      </div>
+
+      <div id="info">
+        <div id="player-position"></div>
       </div>
     </div>
 
-    <div id="info">
-      <div id="player-position"></div>
+    <div id="inventory-screen">
+      <div class="inventory-window"></div>
     </div>
 
     <div id="status"></div>
+
     <script type="module" src="/scripts/main.js"></script>
+
+    <script type="module">
+      import { player } from "/scripts/main.js";
+
+      const titleScreen = document.getElementById("title-screen");
+      const gameUI = document.getElementById("game-ui");
+      const btnPlay = document.getElementById("btn-play");
+      const btnQuit = document.getElementById("btn-quit");
+
+      btnPlay.addEventListener("click", () => {
+        titleScreen.style.display = "none";
+        gameUI.style.display = "block";
+        setTimeout(() => {
+          if (player && player.controls) player.controls.lock();
+        }, 100);
+      });
+
+      btnQuit.addEventListener("click", () => {
+        window.close();
+        window.location.href = "about:blank";
+      });
+    </script>
   </body>
 </html>

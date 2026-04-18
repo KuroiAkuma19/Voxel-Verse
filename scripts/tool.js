@@ -1,5 +1,6 @@
 import * as THREE from "three";
 
+// Animation Not working (tool is loading )
 
 export class Tool extends THREE.Group {
   // Whether the tool is currently animating or not
@@ -30,9 +31,9 @@ export class Tool extends THREE.Group {
     if (!this.animate || !this.toolMesh) return;
     let progress = this.animationTime / this.animationDuration;
     if (progress >= 1) {
-    
+      // Animation finished
       this.animate = false;
-      this.rotation.x = -Math.PI / 4; 
+      this.rotation.x = -Math.PI / 4; // Reset to idle position
       return;
     }
     // Smooth swing: sine wave from 0 to π
@@ -55,7 +56,7 @@ export class Tool extends THREE.Group {
     // Scale to proper size
     this.scale.set(0.05, 0.05, 0.05);
 
-    // Initial rotation values 
+    // Initial rotation values (idle)
     this.rotation.z = Math.PI / 1.5;
     this.rotation.y = Math.PI + 1.5;
     // this.rotation.x = -Math.PI / 4;

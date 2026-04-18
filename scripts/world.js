@@ -1,4 +1,3 @@
-// world.js
 import * as THREE from "three";
 import { WorldChunk } from "./worldChunk.js";
 import { blocks } from "./blocks.js";
@@ -44,12 +43,8 @@ export class World extends THREE.Group {
   };
 
   dataStore = new DataStore();
-
-  // Cache to store generated chunks
   chunkCache = new Map();
-  // Map to store currently visible chunks
   chunks = new Map();
-
   frustum = new THREE.Frustum();
   cameraViewProjectionMatrix = new THREE.Matrix4();
   raycaster = new THREE.Raycaster();
@@ -59,17 +54,6 @@ export class World extends THREE.Group {
     super();
     this.water = this.createWater();
     this.add(this.water);
-
-    // document.addEventListener("keydown", (ev) => {
-    //   switch (ev.code) {
-    //     case "KeyP":
-    //       this.save();
-    //       break;
-    //     case "KeyO":
-    //       this.load();
-    //       break;
-    //   }
-    // });
   }
 
   save() {
@@ -102,6 +86,10 @@ export class World extends THREE.Group {
 
   createWater() {
     const waterGeometry = new THREE.PlaneGeometry(1000, 1000);
+    
+    // UPDATED: Added BASE_URL logic to ensure water textures load on GitHub
+    const baseUrl = import.meta.env.BASE_URL;
+    
     const water = new Water(waterGeometry, {
       color: "#ffffff",
       scale: 4,
@@ -109,6 +97,7 @@ export class World extends THREE.Group {
       textureWidth: 1024,
       textureHeight: 1024,
     });
+
     water.rotation.x = -Math.PI / 2;
     water.position.y = this.params.terrain.waterOffset + 0.4;
     water.layers.set(1);
@@ -262,29 +251,21 @@ export class World extends THREE.Group {
     }
   }
 
-  /**
-   * Handles breaking blocks OR grass
-   * This should be called by our Player interaction logic
-   * @param {THREE.Intersection} intersection
-   */
   breakBlock(intersection) {
-    // Check if we hit an InstancedMesh that isn't a standard block (blocks usually use BoxGeometry)
     if (
       intersection.object.isInstancedMesh &&
       intersection.object.geometry.type !== "BoxGeometry"
     ) {
       const chunk = intersection.object.parent;
-      // Ensure we are modifying a WorldChunk and it has the removeGrassInstance method
       if (
         chunk instanceof WorldChunk &&
         typeof chunk.removeGrassInstance === "function"
       ) {
         chunk.removeGrassInstance(intersection.instanceId);
-        return; 
+        return;
       }
     }
 
-    // Standard block breaking logic
     const point = intersection.point;
     const normal = intersection.face.normal;
 
@@ -316,12 +297,7 @@ export class World extends THREE.Group {
 
   isBlockObscured(x, y, z) {
     const neighbors = [
-      [1, 0, 0],
-      [-1, 0, 0],
-      [0, 1, 0],
-      [0, -1, 0],
-      [0, 0, 1],
-      [0, 0, -1],
+      [1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1],
     ];
 
     for (const [dx, dy, dz] of neighbors) {
