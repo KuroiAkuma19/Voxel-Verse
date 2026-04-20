@@ -8,7 +8,7 @@
     <title>VoxelVerse</title>
 
     <style>
-      /* --- 1. FONTS & RESET --- */
+
       @font-face {
         font-family: "Minecraft";
         src: url("https://fonts.cdnfonts.com/s/18345/MinecraftRegular-Bmg3.woff")
@@ -19,12 +19,12 @@
         margin: 0;
         overflow: hidden;
         font-family: "Minecraft", "Courier New", monospace;
-        /* SAFARI FIX: Added -webkit prefix */
+
         -webkit-user-select: none;
         user-select: none;
       }
 
-      /* --- 2. MINECRAFT BUTTON STYLES --- */
+
       .mc-button {
         position: relative;
         width: 400px;
@@ -55,7 +55,7 @@
         transform: translateY(2px);
       }
 
-      /* --- 3. TITLE SCREEN --- */
+      
       #title-screen {
         position: absolute;
         top: 0;
@@ -72,7 +72,7 @@
           rgba(0, 0, 0, 0.2) 0%,
           rgba(0, 0, 0, 0.6) 100%
         );
-        /* SAFARI FIX: Added -webkit-backdrop-filter */
+        
         -webkit-backdrop-filter: blur(4px);
         backdrop-filter: blur(4px);
       }
@@ -120,7 +120,7 @@
         text-shadow: 1px 1px 0 #000;
       }
 
-      /* --- 4. GAME HUD --- */
+      
       #game-ui {
         display: none;
       }
@@ -244,14 +244,14 @@
       const btnPlay = document.getElementById("btn-play");
       const btnQuit = document.getElementById("btn-quit");
 
-      // FIXED: Removed duplicate 'import { player }' from here
+     
 
       if (btnPlay) {
         btnPlay.addEventListener("click", () => {
           titleScreen.style.display = "none";
           gameUI.style.display = "block";
           setTimeout(() => {
-            // Check if player and controls are initialized
+          
             if (player && player.controls) {
                 player.controls.lock();
             }

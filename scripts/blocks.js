@@ -1,6 +1,8 @@
 import * as THREE from "three";
 
 const textureLoader = new THREE.TextureLoader();
+// THE KEY FIX: Grab the base URL from Vite
+const baseUrl = import.meta.env.BASE_URL;
 
 function createProceduralTexture(type, mainColorHex, accentColorHex) {
   const size = 64;
@@ -93,11 +95,13 @@ function loadTexture(
   col1 = "#ff00ff",
   col2 = "#000000"
 ) {
+  // THE KEY FIX: Automatically prefix the path with the project base URL
   const texture = textureLoader.load(
-    path,
+    `${baseUrl}${path.startsWith('/') ? path.slice(1) : path}`,
     () => {},
     undefined,
     () => {
+      // Fallback only triggers if the image fails to load
       const procedural = createProceduralTexture(fallbackType, col1, col2);
       texture.image = procedural.image;
       texture.needsUpdate = true;
@@ -111,98 +115,95 @@ function loadTexture(
 }
 
 const textures = {
-  // --- EXISTING TEXTURES ---
-  grass: loadTexture("/textures/grass.png", "noise", "#6dbf4b", "#5a9e3d"),
-  dirt: loadTexture("/textures/dirt.png", "noise", "#8b5a2b", "#6d4520"),
-  stone: loadTexture("/textures/stone.png", "noise", "#909090", "#707070"),
-  coalOre: loadTexture("/textures/coal_ore.png", "noise", "#909090", "#000000"),
-  ironOre: loadTexture("/textures/iron_ore.png", "noise", "#909090", "#d6a874"),
+  grass: loadTexture("textures/grass.png", "noise", "#6dbf4b", "#5a9e3d"),
+  dirt: loadTexture("textures/dirt.png", "noise", "#8b5a2b", "#6d4520"),
+  stone: loadTexture("textures/stone.png", "noise", "#909090", "#707070"),
+  coalOre: loadTexture("textures/coal_ore.png", "noise", "#909090", "#000000"),
+  ironOre: loadTexture("textures/iron_ore.png", "noise", "#909090", "#d6a874"),
 
-  // CRAFTING TABLE
   crafting_table_side: loadTexture(
-    "/textures/crafting_table_side.png",
+    "textures/crafting_table_side.png",
     "pillar",
     "#3b291d",
     "#261911"
   ),
   crafting_table_top: loadTexture(
-    "/textures/crafting_table_top.png",
+    "textures/crafting_table_top.png",
     "rings",
     "#5e4835",
     "#3b291d"
   ),
   crafting_table_front: loadTexture(
-    "/textures/crafting_table_front.png",
+    "textures/crafting_table_front.png",
     "pillar",
     "#3b291d",
     "#261911"
   ),
 
-  // NEW BUILDING TEXTURES (Procedural fallbacks)
   door_top: createProceduralTexture("pillar", "#5e4835", "#3b291d"),
   door_bottom: createProceduralTexture("pillar", "#5e4835", "#3b291d"),
   stone_bricks: createProceduralTexture("bricks", "#757575", "#505050"),
 
   grass_side_snowed: loadTexture(
-    "/textures/grass_side_snowed.png",
+    "textures/grass_side_snowed.png",
     "layers",
     "#ffffff",
     "#8b5a2b"
   ),
   leaves_acacia: loadTexture(
-    "/textures/acacia_leaves.png",
+    "textures/acacia_leaves.png",
     "noise",
     "#5e5e5e",
     "#303030"
   ),
-  ice: loadTexture("/textures/ice.png", "noise", "#a0e0ff", "#d0f0ff"),
+  ice: loadTexture("textures/ice.png", "noise", "#a0e0ff", "#d0f0ff"),
   leaves_spurce_opaque: loadTexture(
-    "/textures/spruce_leaves_opaque.png",
+    "textures/spruce_leaves_opaque.png",
     "noise",
     "#2d4c2d",
     "#1a2e1a"
   ),
   mangrove_leaves: loadTexture(
-    "/textures/mangrove_leaves.png",
+    "textures/mangrove_leaves.png",
     "noise",
     "#4a6b2f",
     "#2d451a"
   ),
   grassSide: loadTexture(
-    "/textures/grass_side_1.png",
+    "textures/grass_side_1.png",
     "layers",
     "#8b5a2b",
     "#6dbf4b"
   ),
   leaves: loadTexture(
-    "/textures/cherry_leaves.png",
+    "textures/cherry_leaves.png",
     "noise",
     "#e85d9e",
     "#c43e7b"
   ),
   treeSide: loadTexture(
-    "/textures/tree_side.png",
+    "textures/tree_side.png",
     "pillar",
     "#7c5c40",
     "#59402b"
   ),
-  treeTop: loadTexture("/textures/tree_top.png", "rings", "#bfa383", "#7c5c40"),
-  sand: loadTexture("/textures/sand.png", "noise", "#e8dcb3", "#d6c28e"),
+  treeTop: loadTexture("textures/tree_top.png", "rings", "#bfa383", "#7c5c40"),
+  sand: loadTexture("textures/sand.png", "noise", "#e8dcb3", "#d6c28e"),
   tall_grass: loadTexture(
-    "/textures/tall_dry_grass.png",
+    "textures/tall_dry_grass.png",
     "shrub",
     "#6dbf4b",
     "#6dbf4b"
   ),
-  snow: loadTexture("/textures/snow.png", "noise", "#ffffff", "#e0e0e0"),
+  snow: loadTexture("textures/snow.png", "noise", "#ffffff", "#e0e0e0"),
   jungle_tree_side: loadTexture(
-    "/textures/jungle_tree_side.jpg",
+    "textures/jungle_tree_side.jpg",
     "pillar",
     "#584630",
     "#3b2e1e"
   ),
   jungle_tree_top: loadTexture(
-    "/textures/jungle_tree_top.jpg",
+    "textures/jungle_tree_top.jpg",
     "rings",
     "#9c7c56",
     "#584630"
@@ -219,51 +220,51 @@ const textures = {
   plank: createProceduralTexture("bricks", "#a07449", "#805836"),
   cobblestone: createProceduralTexture("noise", "#606060", "#404040"),
   glass: createProceduralTexture("noise", "#e0f0ff", "#ffffff"),
-  gravel: loadTexture("/textures/gravel.png", "noise", "#7f7f7f", "#5e5e5e"),
+  gravel: loadTexture("textures/gravel.png", "noise", "#7f7f7f", "#5e5e5e"),
   coarse_dirt: loadTexture(
-    "/textures/coarse_dirt.png",
+    "textures/coarse_dirt.png",
     "noise",
     "#77553b",
     "#5c422d"
   ),
   andesite: loadTexture(
-    "/textures/stone_andesite.png",
+    "textures/stone_andesite.png",
     "noise",
     "#878787",
     "#737373"
   ),
   suspicious_gravel: loadTexture(
-    "/textures/suspicious_gravel_0.png",
+    "textures/suspicious_gravel_0.png",
     "noise",
     "#857d75",
     "#68625c"
   ),
   podzol_top: loadTexture(
-    "/textures/dirt_podzol_top.png",
+    "textures/dirt_podzol_top.png",
     "noise",
     "#5c402a",
     "#4a3322"
   ),
   podzol_side: loadTexture(
-    "/textures/dirt_podzol_side.png",
+    "textures/dirt_podzol_side.png",
     "layers",
     "#5c402a",
     "#77553b"
   ),
   packed_ice: loadTexture(
-    "/textures/ice_packed.png",
+    "textures/ice_packed.png",
     "noise",
     "#a0c0ff",
     "#ffffff"
   ),
   blue_ice: loadTexture(
-    "/textures/blue_ice.png",
+    "textures/blue_ice.png",
     "noise",
     "#4060ff",
     "#a0c0ff"
   ),
   spruce_log_file: loadTexture(
-    "/textures/log_spruce.png",
+    "textures/log_spruce.png",
     "pillar",
     "#3b291d",
     "#261911"
@@ -274,7 +275,6 @@ const textures = {
 };
 
 export const blocks = {
-  // 0 - 26 (Originals)
   empty: { id: 0, name: "Empty" },
   grass: {
     id: 1,
@@ -387,7 +387,7 @@ export const blocks = {
     name: "Jungle Leaves",
     material: new THREE.MeshLambertMaterial({
       map: loadTexture(
-        "/textures/azalea_leaves.png",
+        "textures/azalea_leaves.png",
         "noise",
         "#58a040",
         "#3e7529"
@@ -528,8 +528,6 @@ export const blocks = {
       side: THREE.DoubleSide,
     }),
   },
-
-  // --- NEW BLOCKS ---
   gravel: {
     id: 27,
     name: "Gravel",
@@ -574,8 +572,6 @@ export const blocks = {
     name: "Blue Ice",
     material: new THREE.MeshLambertMaterial({ map: textures.blue_ice }),
   },
-
-  // 40: Crafting Table
   craftingTable: {
     id: 40,
     name: "Crafting Table",
@@ -588,13 +584,11 @@ export const blocks = {
       new THREE.MeshLambertMaterial({ map: textures.crafting_table_side }),
     ],
   },
-
-  // --- BUILDINGS (Added) ---
   door: {
     id: 41,
     name: "Door",
     material: new THREE.MeshLambertMaterial({ map: textures.door_top }),
-  }, // Placeholder 1x1 block
+  },
   stoneBricks: {
     id: 42,
     name: "Stone Bricks",
@@ -604,13 +598,12 @@ export const blocks = {
     id: 43,
     name: "Oak Stairs",
     material: new THREE.MeshLambertMaterial({ map: textures.plank }),
-  }, // Block placeholder
+  },
   oakSlab: {
     id: 44,
     name: "Oak Slab",
     material: new THREE.MeshLambertMaterial({ map: textures.plank }),
-  }, // Block placeholder
-
+  },
   moss: {
     id: 50,
     name: "Moss Block",
